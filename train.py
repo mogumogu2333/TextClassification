@@ -45,7 +45,7 @@ print("")
 
 # Load data
 print("Loading data...")
-x_text, y = data_helpers.load_data_and_labels()
+x_text, y = data_helpers.load_onetouch_data_and_labels()
 
 # Build vocabulary
 max_document_length = max([len(x.split(" ")) for x in x_text])
@@ -60,8 +60,8 @@ y_shuffled = y[shuffle_indices]
 
 # Split train/test set
 # TODO: This is very crude, should use cross-validation
-x_train, x_dev = x_shuffled[:-1000], x_shuffled[-1000:]
-y_train, y_dev = y_shuffled[:-1000], y_shuffled[-1000:]
+x_train, x_dev = x_shuffled[:-300], x_shuffled[-300:]
+y_train, y_dev = y_shuffled[:-300], y_shuffled[-300:]
 print("Vocabulary Size: {:d}".format(len(vocab_processor.vocabulary_)))
 print("Train/Dev split: {:d}/{:d}".format(len(y_train), len(y_dev)))
 
@@ -77,7 +77,7 @@ with tf.Graph().as_default():
     with sess.as_default():
         cnn = TextCNN(
             sequence_length=x_train.shape[1],
-            num_classes=2,
+            num_classes=3,
             vocab_size=len(vocab_processor.vocabulary_),
             embedding_size=FLAGS.embedding_dim,
             filter_sizes=list(map(int, FLAGS.filter_sizes.split(","))),
@@ -131,16 +131,15 @@ with tf.Graph().as_default():
 
         # Initialize all variables
         sess.run(tf.initialize_all_variables())
-        # Initialize all variables
-        sess.run(tf.initialize_all_variables())
+
         if FLAGS.word2vec:
-            # initial matrix with random uniform
-            initW = np.random.uniform(-0.25,0.25,(len(vocab_processor.vocabulary_), FLAGS.embedding_dim))
             # load any vectors from the word2vec
             print("Load word2vec file {}\n".format(FLAGS.word2vec))
             with open(FLAGS.word2vec, "rb") as f:
                 header = f.readline()
                 vocab_size, layer1_size = map(int, header.split())
+                # initial matrix with random uniform
+                initW = np.random.uniform(-0.25, 0.25, (vocab_size, FLAGS.embedding_dim))
                 binary_len = np.dtype('float32').itemsize * layer1_size
                 for line in xrange(vocab_size):
                     word = []

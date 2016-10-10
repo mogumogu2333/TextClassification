@@ -31,17 +31,20 @@ def load_data_and_labels():
     Returns split sentences and labels.
     """
     # Load data from files
-    positive_examples = list(open("./data/rt-polaritydata/rt-polarity.pos", "r").readlines())
-    positive_examples = [s.strip() for s in positive_examples]
-    negative_examples = list(open("./data/rt-polaritydata/rt-polarity.neg", "r").readlines())
-    negative_examples = [s.strip() for s in negative_examples]
+    music_examples = list(open("./data/onetouch/music.txt", "r").readlines())
+    music_examples = [s.strip() for s in music_examples]
+    call_examples = list(open("./data/onetouch/call.txt", "r").readlines())
+    call_examples = [s.strip() for s in call_examples]
+    command_examples = list(open("./data/onetouch/command.txt", "r").readlines())
+    command_examples = [s.strip() for s in command_examples]
     # Split by words
-    x_text = positive_examples + negative_examples
+    x_text = music_examples + call_examples + command_examples
     x_text = [clean_str(sent) for sent in x_text]
     # Generate labels
-    positive_labels = [[0, 1] for _ in positive_examples]
-    negative_labels = [[1, 0] for _ in negative_examples]
-    y = np.concatenate([positive_labels, negative_labels], 0)
+    music_labels = [[1, 0, 0] for _ in music_examples]
+    call_labels = [[0, 1, 0] for _ in call_examples]
+    command_labels = [[0, 0, 1] for _ in command_examples]
+    y = np.concatenate([music_labels, call_labels, command_labels], 0)
     return [x_text, y]
 
 
@@ -63,26 +66,3 @@ def batch_iter(data, batch_size, num_epochs, shuffle=True):
             start_index = batch_num * batch_size
             end_index = min((batch_num + 1) * batch_size, data_size)
             yield shuffled_data[start_index:end_index]
-
-
-def load_onetouch_data_and_labels():
-    """
-    Loads MR polarity data from files, splits the data into words and generates labels.
-    Returns split sentences and labels.
-    """
-    # Load data from files
-    music_examples = list(open("./data/onetouch/music.txt", "r").readlines())
-    music_examples = [s.strip() for s in music_examples]
-    call_examples = list(open("./data/onetouch/call.txt", "r").readlines())
-    call_examples = [s.strip() for s in call_examples]
-    command_examples = list(open("./data/onetouch/command.txt", "r").readlines())
-    command_examples = [s.strip() for s in command_examples]
-    # Split by words
-    x_text = music_examples + call_examples + command_examples
-    x_text = [clean_str(sent) for sent in x_text]
-    # Generate labels
-    music_labels = [[1, 0, 0] for _ in music_examples]
-    call_labels = [[0, 1, 0] for _ in call_examples]
-    command_labels = [[0, 0, 1] for _ in command_examples]
-    y = np.concatenate([music_labels, call_labels, command_labels], 0)
-    return [x_text, y]

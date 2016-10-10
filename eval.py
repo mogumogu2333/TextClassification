@@ -5,6 +5,9 @@ import numpy as np
 import os
 import time
 import datetime
+
+from numpy.core.tests.test_mem_overlap import xrange
+
 import data_helpers
 from text_cnn import TextCNN
 from tensorflow.contrib import learn
@@ -35,7 +38,7 @@ if FLAGS.eval_train:
     y_test = np.argmax(y_test, axis=1)
 else:
     x_raw = ["a masterpiece four years in the making", "everything is off.","shang yue"]
-    y_test = [1, 0]
+    y_test = [1, 0, 0]
 
 # Map data into vocabulary
 vocab_path = os.path.join(FLAGS.checkpoint_dir, "..", "vocab")
