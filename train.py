@@ -9,6 +9,8 @@ from numpy.core.tests.test_mem_overlap import xrange
 
 import data_helpers
 import tensorflow as tf
+
+import onetouch_helper
 from text_cnn import TextCNN
 from tensorflow.contrib import learn
 
@@ -45,7 +47,9 @@ print("")
 
 # Load data
 print("Loading data...")
-x_text, y = data_helpers.load_data_and_labels()
+# x_text, y = data_helpers.load_data_and_labels()
+x_text, y = onetouch_helper.load_data_and_labels()
+
 
 # Build vocabulary
 max_document_length = max([len(x.split(" ")) for x in x_text])
@@ -60,8 +64,8 @@ y_shuffled = y[shuffle_indices]
 
 # Split train/test set
 # TODO: This is very crude, should use cross-validation
-x_train, x_dev = x_shuffled[:-1000], x_shuffled[-1000:]
-y_train, y_dev = y_shuffled[:-1000], y_shuffled[-1000:]
+x_train, x_dev = x_shuffled[:-100], x_shuffled[-100:]
+y_train, y_dev = y_shuffled[:-100], y_shuffled[-100:]
 print("Vocabulary Size: {:d}".format(len(vocab_processor.vocabulary_)))
 print("Train/Dev split: {:d}/{:d}".format(len(y_train), len(y_dev)))
 
@@ -77,7 +81,7 @@ with tf.Graph().as_default():
     with sess.as_default():
         cnn = TextCNN(
             sequence_length=x_train.shape[1],
-            num_classes=2,
+            num_classes=6,
             vocab_size=len(vocab_processor.vocabulary_),
             embedding_size=FLAGS.embedding_dim,
             filter_sizes=list(map(int, FLAGS.filter_sizes.split(","))),
@@ -133,6 +137,7 @@ with tf.Graph().as_default():
         sess.run(tf.initialize_all_variables())
         # Initialize all variables
         sess.run(tf.initialize_all_variables())
+
         if FLAGS.word2vec:
             # initial matrix with random uniform
             initW = np.random.uniform(-0.25,0.25,(len(vocab_processor.vocabulary_), FLAGS.embedding_dim))
